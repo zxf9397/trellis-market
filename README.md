@@ -1,25 +1,39 @@
 # Trellis Marketplace
 
-Downloadable templates for Claude Code users.
+可复用的 Trellis spec 模板仓库。
 
 ## Structure
 
+```text
+index.json
+specs/
+└── react-antd-frontend/
+    ├── README.md
+    ├── frontend/
+    ├── guides/
+    └── shared/
 ```
-marketplace/
-├── skills/      # Claude Skills (.claude/skills/)
-├── commands/    # Slash Commands (.claude/commands/)
-├── agents/      # Sub-agent definitions (.claude/agents/)
-└── specs/       # Spec templates (.trellis/spec/)
+
+`index.json` 中的 `path` 相对仓库根目录。当前模板路径是：
+
+```text
+specs/react-antd-frontend
 ```
 
 ## Usage
 
-### Install via npx skills
-
 ```bash
-npx skills add mindfold-ai/Trellis/marketplace
+trellis init --registry gh:zxf9397/trellis-market#main --template react-antd-frontend
 ```
 
-### Manual Installation
+已有项目只补齐不存在的 spec 文件：
 
-Copy the desired template to your project's corresponding directory.
+```bash
+trellis init --registry gh:zxf9397/trellis-market#main --template react-antd-frontend --append
+```
+
+### Direct mode
+
+```bash
+trellis init --registry gh:zxf9397/trellis-market/specs/react-antd-frontend#main
+```

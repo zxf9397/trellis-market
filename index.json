@@ -6,7 +6,7 @@
       "type": "spec",
       "name": "React + Vite Frontend",
       "description": "Vite + React + TypeScript + Ant Design 前端分层规范：env、API、路由、组件边界、状态、ProTable 列表、样式与质量门禁",
-      "path": "marketplace/specs/react-antd-frontend",
+      "path": "specs/react-antd-frontend",
       "tags": [
         "react",
         "vite",
