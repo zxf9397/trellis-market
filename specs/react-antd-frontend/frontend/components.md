@@ -25,8 +25,7 @@ paths:
 ```text
 src/components/ui/DescriptionDrawer/
 ├── index.tsx
-├── index.less
-└── index.test.tsx
+└── index.less
 
 src/components/business/AuthModal/
 ├── components/
@@ -34,8 +33,7 @@ src/components/business/AuthModal/
 │   ├── RegisterForm.tsx
 │   └── ForgotPasswordForm.tsx
 ├── index.tsx
-├── index.less
-└── index.test.tsx
+└── index.less
 ```
 
 规则：

@@ -23,8 +23,8 @@ paths:
    手动请求把成功分支写在 `useRequest` 的 async service 内，并放在 `await request(...)` 之后；接口错误由统一响应拦截器处理，不在 `useRequest` 里写 `onSuccess` / `onError`。
 7. **样式/主题**  
    优先复用 token 和 Ant Design；新增 token 必须说明复用场景。
-8. **测试与文档**  
-   更新组件测试、hook 测试、`frontend/README.md` 和相关 spec。
+8. **验证与文档**
+   默认执行 `pnpm lint` 和 `pnpm typecheck`，并修复问题；不生成测试文件、不运行 Vitest。测试和构建由开发人员决定；用户要求验证时再更新/执行测试，并更新 `frontend/README.md` 和相关 spec。
 
 ## 一致性检查
 

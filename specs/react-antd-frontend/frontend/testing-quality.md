@@ -1,6 +1,6 @@
 ---
 name: frontend-testing-quality
-description: 测试、格式化、pre-commit、性能、安全和验收检查
+description: 测试触发规则、格式化、pre-commit、性能、安全和验收检查
 paths:
   - frontend/src/components/ui/
   - frontend/src/components/business/
@@ -15,7 +15,45 @@ paths:
 
 # 质量门禁
 
-## 必须通过的命令
+## 基础检查与验证边界
+
+每次代码变更后，默认必须完成基础检查：
+
+```bash
+pnpm lint
+pnpm typecheck
+```
+
+这类检查用于发现语法、导入、类型和静态规则问题；发现错误时应修复后再次执行。
+
+默认不执行：
+
+- `pnpm test`
+- `pnpm test:watch`
+- `pnpm coverage`
+- `pnpm build`
+
+默认也不新建 `*.test.ts`、`*.test.tsx`、`*.spec.ts`、`*.spec.tsx`，不运行 `vitest`。
+
+测试和构建由开发人员决定。只有开发人员明确要求时才生成或执行测试，例如：
+
+- “帮我测试一下。”
+- “测试验证一下。”
+- “跑一下测试。”
+- “补充单元测试。”
+- “覆盖这个场景的测试。”
+
+只有开发人员明确要求时才执行构建，例如：
+
+- “帮我 build 验证一下。”
+- “执行构建检查。”
+- “打包验证。”
+
+用户要求后，按变更范围选择 targeted test 或全量测试；仍然不要把无关测试文件一次性补齐。
+
+基础检查通过后，完成说明中报告结果，并可以询问：“是否需要继续执行 test / build 验证？”
+
+## 可用命令
 
 `package.json` 至少提供：
 
@@ -37,12 +75,21 @@ paths:
 }
 ```
 
-提交前按变更范围执行：
+默认执行基础检查：
+
+```bash
+pnpm lint
+pnpm typecheck
+```
+
+开发人员明确要求后，再按变更范围执行扩展验证：
 
 - 全量：`pnpm lint && pnpm typecheck && pnpm test && pnpm build`
-- 纯样式：至少 lint + build
-- API/store/router：lint + typecheck + test + build
-- 配置文件：lint + build，并在 staging 或本地 preview 验证
+- 纯样式：`pnpm lint`，可选 `pnpm build`
+- API/store/router：`pnpm lint && pnpm typecheck`，可选 `pnpm test && pnpm build`
+- 配置文件：`pnpm lint && pnpm typecheck`，可选 `pnpm build` 和本地 preview 验证
+
+未要求时，不自动执行测试或构建；也不要用 pre-commit 隐式触发测试。
 
 ## Prettier
 
@@ -92,8 +139,7 @@ pnpm exec lint-staged
 {
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix",
-      "vitest related --run"
+      "eslint --fix"
     ],
     "*.{js,mjs,cjs,less,css,json,md}": [
       "prettier --write"
@@ -104,11 +150,13 @@ pnpm exec lint-staged
 
 规则：
 
-- pre-commit 不跑完整 build。
+- pre-commit 只做 lint 和格式化，不运行 Vitest，不跑完整 build。
 - 修复后的文件必须重新 stage。
 - 提交信息使用 Conventional Commits，描述必须使用中文：`feat(product-list): 新增商品关键字搜索`。
 
 ## 测试策略
+
+以下策略仅在开发人员明确要求检查、测试或补充测试时执行。
 
 优先测试：
 

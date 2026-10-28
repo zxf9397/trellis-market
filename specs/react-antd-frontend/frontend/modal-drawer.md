@@ -64,8 +64,7 @@ Provider 顺序原则：
 ```text
 src/components/business/AfterSaleCancelModal/
 ├── index.tsx
-├── index.less
-└── index.test.tsx
+└── index.less
 
 src/components/business/AuthModal/
 ├── components/
@@ -73,8 +72,7 @@ src/components/business/AuthModal/
 │   ├── RegisterForm.tsx
 │   └── ForgotPasswordForm.tsx
 ├── index.tsx
-├── index.less
-└── index.test.tsx
+└── index.less
 ```
 
 - 目录名使用 PascalCase，并以 `Modal`、`Drawer`、`ConfirmDialog` 结尾。
@@ -186,7 +184,7 @@ if (confirmed) {
 
 规则：
 
-- 不要求显式添加 `void`。`NiceModal.show(...)` 可以直接调用；只有调用方需要根据弹窗结果分支时才使用 `await`。
+- 禁止在运行时代码使用 `void` 操作符。`NiceModal.show(...)` 直接调用；需要根据弹窗结果分支时使用 `await`。
 - 需要根据结果分支时 `await NiceModal.show(...)`。
 - `NiceModal.show()` 的 args 只传业务参数和结果回调，不传 `open`。
 - 同一个业务操作在多个页面复用时，弹窗放 `src/components/business/`。

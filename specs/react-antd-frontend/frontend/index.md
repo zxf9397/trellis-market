@@ -33,6 +33,8 @@ description: React + Vite 前端规范导航
 - 禁止硬编码状态、类型码和业务字典值，运行时必须引用常量成员。
 - 业务弹窗、业务抽屉和异步确认框必须使用 `@ebay/nice-modal-react` 封装。
 - 表单统一使用 Ant Design `Form` / `Form.Item`；提交前校验，loading 中禁止重复提交。
+- 每次变更默认执行 `pnpm lint` 和 `pnpm typecheck`；测试、构建由开发人员决定。
+- 用户未要求测试时，不生成测试文件、不运行 Vitest。
 - 服务端分页业务列表默认使用 ProTable，统一转换 `pageNo` / `pageSize` 并过滤空参数。
 - 不使用 `useRequest` 的 `onSuccess` / `onError`；错误由响应拦截器统一处理。
 - 禁止绕过 `src/config/env.ts` 直接读取 `import.meta.env`。

@@ -15,6 +15,7 @@ paths:
 - 不写只有调用处不同的近似重复逻辑。
 - 优先声明式数据映射，不写重复 if/else 字典。
 - 不硬编码状态、类型码、来源、级别和业务字典；使用 `as const` 常量对象收口。
+- 运行时代码禁止 `void` 操作符；故意不等待 Promise 时直接调用，不要写 `void requestPage()`。需要处理 rejection 时使用 `await try/catch` 或 `.catch()`。
 
 ## 注释
 

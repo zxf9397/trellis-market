@@ -20,6 +20,7 @@ paths:
 - [ ] 手动动作成功后的业务处理写在 `useRequest` async service 内的 `await request(...)` 之后；错误提示不重复处理。
 - [ ] 没有页面互相 import 私有实现。
 - [ ] 新 alias 同时配置 Vite、TS、ESLint。
+- [ ] 运行时代码没有 `void` 操作符；具体函数实现不写 `: void` 返回注解。
 
 ## 配置与 API
 
@@ -59,8 +60,9 @@ paths:
 
 ## 质量
 
-- [ ] `lint`、`typecheck`、`test`、`build` 通过。
-- [ ] 关键路径有测试。
+- [ ] 默认已执行 `pnpm lint` 和 `pnpm typecheck`，错误已修复。
+- [ ] `test` 和 `build` 由开发人员决定；未要求时不自动执行。
+- [ ] 未自动生成测试文件；用户要求测试时关键路径有测试。
 - [ ] 没有 secret、无关调试日志、注释掉的死代码。
 - [ ] 新依赖必要且锁文件更新。
 - [ ] 相关文档和 spec 已更新。

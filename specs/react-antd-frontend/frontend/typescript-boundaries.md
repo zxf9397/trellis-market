@@ -53,10 +53,59 @@ paths:
 
 - 不关闭 `strict`。
 - 不用 `any` 兜底；unknown 数据必须先窄化。
-- 公共导出写显式返回类型。
+- 禁止运行时代码使用 `void` 操作符。
+- 具体函数声明、方法或函数表达式的无返回值返回注解必须省略，不要写 `: void`；`void` 只保留在类型契约中，例如 `onClose?: () => void`。
+- 故意不等待的 Promise 直接调用 `requestPage()`；不要写 `void requestPage()`。需要处理 rejection 时使用 `await try/catch` 或 `.catch()`。
+- 公共导出函数如果有返回值，写显式返回类型；无返回值时省略 `: void`，让 TypeScript 推断。
 - 联合状态使用 discriminated union，不用多个可空字段表达互斥状态。
 - 枚举优先使用 `as const` 对象或字符串 union，除非需要运行时双向映射。
 - 组件 props 用 `interface`；复杂工具类型放 `src/types/`。
+
+## Void 返回类型
+
+无返回值的具体函数不要显式写 `: void`：
+
+```ts
+// ok
+export function useDocumentTitle(title?: string) {
+  useEffect(() => {
+    if (!title) {
+      return;
+    }
+
+    const previousTitle = document.title;
+    document.title = title;
+
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [title]);
+}
+```
+
+```ts
+// bad
+export function useDocumentTitle(title?: string): void {
+  // ...
+}
+```
+
+这条规则只约束具体函数实现。类型契约中的回调返回类型仍保留 `void`：
+
+```ts
+// ok
+interface ExampleProps {
+  onCancel?: () => void;
+}
+```
+
+有返回值的公共导出函数仍写显式返回类型：
+
+```ts
+export async function getUser(id: string): Promise<User> {
+  return client.get<User>(`/users/${id}`);
+}
+```
 
 ## 类型文件
 
@@ -96,6 +145,7 @@ src/types/
 - TypeScript recommended + React hooks + React refresh。
 - Prettier compatibility。
 - 禁用 `enum`：使用 `no-restricted-syntax` 匹配 `TSEnumDeclaration`。
+- 禁用 `void` 操作符：启用 `no-void`，不开启 `allowAsStatement`。
 - import order。
 - boundaries。
 
@@ -144,6 +194,7 @@ export default [
 - 循环 import。
 - 直接引用深层路径绕过目录入口。
 - 关闭规则的 `eslint-disable`，除非带原因和到期说明。
+- 运行时代码中的 `void requestPage()`。
 
 ## Import 顺序
 
