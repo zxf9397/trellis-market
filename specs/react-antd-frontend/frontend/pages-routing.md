@@ -127,7 +127,7 @@ routeMap.app.productDetail.getFullPath({ productId: '123456' });
 - `routes` 是唯一 React Router 路由来源；`routeMap` 由同一份路由树生成。
 - 跳转使用 `routeMap.<id>.getFullPath()`，不写裸路径。
 - 动态参数由 `getFullPath()` 显式传入；参数缺失时保留占位符。
-- index 路由使用 `index: true`，route map 中用其 `id` 作为路径段。
+- index 路由使用 `index: true`，route map 中返回其父路径；`id` 只作为 registry key。
 - React Router 元信息统一放在 `handle`，不要扩展非标准 `meta` 或 `authRoute`。
 
 ## 守卫

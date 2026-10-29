@@ -60,8 +60,8 @@ export function getRouteMap<R extends readonly AnyRoute[]>(
   const map: Record<string, unknown> = {};
 
   for (const route of routes) {
-    // index 路由用 id 当路径段；普通路由用 path
-    const segment = route.index ? route.id : (route.path ?? '');
+    // index 路由渲染在父路径上；普通路由用自己的 path
+    const segment = route.index ? '' : (route.path ?? '');
     const fullPath = joinPath(parentPath, segment);
 
     const node: Record<string, unknown> = {
@@ -135,7 +135,7 @@ export const router = createBrowserRouter(routes);
 ```ts
 routeMap.app.getFullPath(); // "/app"
 
-routeMap.app.home.getFullPath(); // "/app/home"
+routeMap.app.home.getFullPath(); // "/app"
 
 routeMap.app.productList.getFullPath(); // "/app/product"
 
@@ -150,6 +150,6 @@ routeMap.app.productDetail.getFullPath({ productId: '123456' });
 - `routeMap` 只用于路径跳转，不承载业务加工。
 - 动态路径参数由 `getFullPath(params)` 显式传入。
 - 参数缺失时保留 `:productId` 占位符，便于排查。
-- index 路由在 route map 中使用 `id` 作为路径段。
+- index 路由渲染在父路径上；route map 对 index 返回父路径，`id` 只作为 registry key。
 - 路由元信息放在 React Router 的 `handle` 中，守卫和布局通过 `useMatches()` 读取。
 - 新增、修改、删除路由只维护 `routes`。
