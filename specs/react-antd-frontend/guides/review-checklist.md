@@ -19,6 +19,9 @@ paths:
 - [ ] 没有使用 `useRequest` 的 `onSuccess` / `onError`。
 - [ ] 手动动作成功后的业务处理写在 `useRequest` async service 内的 `await request(...)` 之后；错误提示不重复处理。
 - [ ] 没有页面互相 import 私有实现。
+- [ ] 新路由受认证/权限守卫控制，路由元信息使用 `handle`。
+- [ ] 路由页面使用 `lazy(() => import(...))`，跳转使用 `routeMap.<id>.getFullPath()`。
+- [ ] Route Registry 使用全局唯一 `id`、`path`、`Component` / `element`、`handle` 和 `getFullPath`；`id` 唯一且跳转通过 `getFullPath`。
 - [ ] 新 alias 同时配置 Vite、TS、ESLint。
 - [ ] 运行时代码没有 `void` 操作符；具体函数实现不写 `: void` 返回注解。
 
@@ -27,8 +30,12 @@ paths:
 - [ ] 没有新增未文档化的环境变量。
 - [ ] `import.meta.env` 只出现在 `src/config/env.ts`。
 - [ ] API 只在 `src/api/**` 调用，并走 `client.get` / `client.post`。
+- [ ] API 领域函数第一个参数是类型化 `params` 对象，不使用离散基础类型参数。
+- [ ] API 只做 HTTP 协议请求和响应透传；业务加工不在 `src/api/**`。
 - [ ] 错误统一转成 `ApiError`。
 - [ ] API 类型、字段和接口函数已有 JSDoc；字段命名与接口文档一致。
+- [ ] API 函数命名使用 `getMemberInfo`、`getProductList`、`getProductDetail`、`createProduct` 等约定。
+- [ ] 可推断返回值的函数没有写显式返回类型。
 - [ ] 重要业务逻辑有简洁注释。
 - [ ] 无接口文档的接口使用 typed API Mock，并带 `TODO(api-doc)` 和约定日志。
 - [ ] 已提供接口文档的接口已删除 Mock、`console.log` 和 `TODO(api-doc)`。

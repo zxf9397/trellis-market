@@ -33,11 +33,10 @@ pnpm add @ebay/nice-modal-react
 ```tsx
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { NiceModal } from '@ebay/nice-modal-react';
+import NiceModal from '@ebay/nice-modal-react';
 import { StyleProvider } from '@ant-design/cssinjs';
 import { ConfigProvider } from 'antd';
-import { RouterProvider } from 'react-router-dom';
-import { router } from '@/router';
+import App from '@/App';
 import { lightTheme } from '@/styles/antd/antd';
 import '@/styles/global.less';
 
@@ -46,7 +45,7 @@ createRoot(document.getElementById('root')!).render(
     <ConfigProvider theme={lightTheme}>
       <StyleProvider hashPriority="low">
         <NiceModal.Provider>
-          <RouterProvider router={router} />
+          <App />
         </NiceModal.Provider>
       </StyleProvider>
     </ConfigProvider>
@@ -84,7 +83,7 @@ src/components/business/AuthModal/
 ## 标准异步确认弹窗
 
 ```tsx
-import { NiceModal } from '@ebay/nice-modal-react';
+import NiceModal from '@ebay/nice-modal-react';
 import { Modal, message } from 'antd';
 import { cancelRefund } from '@/api/afterSale';
 import { useRequest } from 'ahooks';
@@ -101,7 +100,11 @@ const AfterSaleCancelModal = NiceModal.create(
     const { loading, run } = useRequest(
       async () => {
         try {
-          await cancelRefund({ order_product_id: orderProductId });
+          const params = {
+            order_product_id: orderProductId,
+          };
+
+          await cancelRefund(params);
 
           // 请求成功后才执行业务动作。
           onSuccess?.();
@@ -155,7 +158,7 @@ export default AfterSaleCancelModal;
 
 ```tsx
 import { Button } from 'antd';
-import { NiceModal } from '@ebay/nice-modal-react';
+import NiceModal from '@ebay/nice-modal-react';
 import AfterSaleCancelModal from '@/components/business/AfterSaleCancelModal';
 
 export function CancelButton({ orderProductId }: { orderProductId: string }) {

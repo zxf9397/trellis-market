@@ -282,7 +282,7 @@ export const darkTheme: ThemeConfig = {
 <ConfigProvider theme={currentTheme}>
   <StyleProvider hashPriority="low">
     <NiceModal.Provider>
-      <RouterProvider router={router} />
+      <App />
     </NiceModal.Provider>
   </StyleProvider>
 </ConfigProvider>

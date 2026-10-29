@@ -15,6 +15,8 @@ paths:
 - 不写只有调用处不同的近似重复逻辑。
 - 优先声明式数据映射，不写重复 if/else 字典。
 - 不硬编码状态、类型码、来源、级别和业务字典；使用 `as const` 常量对象收口。
+- `src/api/**` 不做业务加工、派生状态、列表聚合或跨接口编排；这些逻辑放领域 hook、页面或纯工具函数。
+- API 领域函数的第一个参数必须是类型化 `params` 对象，不使用离散基础类型参数。
 - 运行时代码禁止 `void` 操作符；故意不等待 Promise 时直接调用，不要写 `void requestPage()`。需要处理 rejection 时使用 `await try/catch` 或 `.catch()`。
 
 ## 注释
@@ -45,5 +47,5 @@ API 类型、接口函数和字段必须写 JSDoc；字段名、类型和注释�
 - boolean：`isLoading`、`hasPermission`、`canSubmit`。
 - 事件 props：`onChange`、`onClose`。
 - handler：`handleSubmit`、`handleSelect`。
-- API：`getUser`、`listProducts`。
+- API：`getMemberInfo`、`getProductList`、`getProductDetail`、`createProduct`、`updateProduct`、`deleteProduct`。
 - 避免无意义词：`data2`、`temp`、`handleClick2`。

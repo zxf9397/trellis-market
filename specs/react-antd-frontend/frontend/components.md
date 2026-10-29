@@ -94,7 +94,8 @@ export default function DescriptionDrawer({
 
 ## 状态与副作用
 
-- UI 组件不允许发请求。
+- 纯 UI 组件不允许发请求。
+- 通用数据绑定组件可以接受调用方注入的 `request` 函数；组件自身禁止 import 具体领域 API 或 store，且必须继续通过 props 驱动。
 - 非 Modal/Drawer 的业务组件可以通过 hooks 请求，但优先由页面 hook 下发数据。
 - 业务 Modal/Drawer 通过 Nice Modal 管理生命周期；初始数据通过 `NiceModal.show()` 参数传入，首次打开后再执行查询。
 - 列表选择、表单编辑这类临时状态放组件内部或页面 hook，不放全局 store。
@@ -112,7 +113,7 @@ export default function DescriptionDrawer({
 ```tsx
 // src/pages/ProductList/index.tsx
 import { Button } from 'antd';
-import { NiceModal } from '@ebay/nice-modal-react';
+import NiceModal from '@ebay/nice-modal-react';
 import ProductsSelectModal from '@/components/business/ProductsSelectModal';
 
 export default function ProductList() {

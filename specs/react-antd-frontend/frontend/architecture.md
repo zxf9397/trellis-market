@@ -45,7 +45,7 @@ App / main
 | --- | --- | --- |
 | `src/main.tsx` | 挂载 React、Nice Modal Provider、StyleProvider、ConfigProvider、全局样式 | 写业务分支 |
 | `src/App.tsx` | 只承载 `RouterProvider` 或应用外壳 | 定义页面 |
-| `src/api/` | HTTP、拦截器、错误、按领域的接口模块 | 渲染 UI、操作 DOM |
+| `src/api/` | HTTP、拦截器、错误、按领域的接口模块 | 渲染 UI、操作 DOM、业务加工、派生状态或跨接口聚合 |
 | `src/components/ui/` | 零业务、可复用、props 驱动 | 依赖 `api/`、`store/`、页面 |
 | `src/components/business/` | 有业务含义的复合组件；业务弹窗/抽屉统一使用 Nice Modal | 依赖 `pages/`、`router/`、自维护 `open` 状态 |
 | `src/config/` | 环境变量解析、feature flags | 存放可变运行时状态 |

@@ -42,7 +42,7 @@ pnpm add ahooks
 // src/pages/ProductList/hooks/useProductFilters.ts
 import { useMemo, useRef, useState } from 'react';
 import { useRequest } from 'ahooks';
-import { listProducts } from '@/api/products';
+import { getProductList } from '@/api/products';
 import { isRequestCancelled } from '@/api/error';
 import type { ProductListParams } from '@/api/products/types';
 
@@ -63,7 +63,7 @@ export function useProductFilters() {
       abortRef.current = controller;
 
       try {
-        return await listProducts(filters, { signal: controller.signal });
+        return await getProductList(filters, { signal: controller.signal });
       } catch (error) {
         if (isRequestCancelled(error)) {
           return undefined;
@@ -118,7 +118,12 @@ export function CreateProductButton() {
   const { loading, run } = useRequest(
     async () => {
       try {
-        await createProduct({ name: 'Example', price: 99 });
+        const params = {
+          name: 'Example',
+          price: 99,
+        };
+
+        await createProduct(params);
 
         // 请求成功后才执行业务动作。
         message.success('创建成功');

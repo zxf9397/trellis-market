@@ -173,14 +173,20 @@ export interface UpdateUserStatusParams {
 ```
 
 ```ts
+// src/api/user/types.ts
+export interface GetDisabledUsersParams {}
+
 // src/api/user/index.ts
 import { client } from '@/api/client';
 import { UserStatus } from '@/constants/enums';
-import type { User } from './types';
+import type { GetDisabledUsersParams } from './types';
 
-export async function getDisabledUsers() {
+export async function getDisabledUsers(
+  params: GetDisabledUsersParams,
+) {
   return client.get<User[]>('/users', {
     params: {
+      ...params,
       status: UserStatus.Disabled,
     },
   });

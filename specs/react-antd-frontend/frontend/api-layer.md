@@ -1,6 +1,6 @@
 ---
 name: frontend-api-layer
-description: Axios 实例、类型增强 client、取消请求、错误和 401 处理
+description: Axios 实例、类型增强 client、取消请求、错误处理和 API 边界
 paths:
   - frontend/src/api/
   - frontend/src/constants/http.ts
@@ -31,7 +31,11 @@ src/api/
 - `error.ts` 定义 `ApiError`、取消判断和错误归一化。
 - 领域接口放在 `user/index.ts`、`products/index.ts`。
 - 领域数据结构放同目录 `types.ts`，公共响应结构放 `src/types/api.ts`。
+- API 只负责 HTTP 协议请求和响应透传，不做业务加工；业务加工放领域 hook、页面或纯工具函数。
 - API 类型、字段和接口函数必须有 JSDoc；无接口文档时的 Mock 统一见 [api-mock-doc.md](./api-mock-doc.md)。
+- `params` 对象、业务加工边界见 [api-boundary.md](./api-boundary.md)。
+- 取消请求见 [api-cancel.md](./api-cancel.md)。
+- 错误模型和响应结构见 [api-error.md](./api-error.md)。
 - `axios` 原始模块只允许出现在 `instance.ts`、`interceptors.ts` 和 `error.ts` 中；用途仅限创建实例、类型和取消判断。
 - 组件、hook、store、页面、领域 API 禁止直接 `import axios` 或直接调用 `axios.get` / `axios.post`。
 
@@ -67,13 +71,13 @@ export type RequestConfig = Omit<AxiosRequestConfig, 'url' | 'method'> & {
 
 async function unwrap<TData>(
   request: Promise<AxiosResponse<ApiResponse<TData>>>,
-): Promise<TData> {
+) {
   const response = await request;
   return response.data.data;
 }
 
 export const client = {
-  get<TData>(url: string, config?: RequestConfig): Promise<TData> {
+  get<TData>(url: string, config?: RequestConfig) {
     return unwrap<TData>(instance.get<ApiResponse<TData>>(url, config));
   },
 
@@ -81,13 +85,13 @@ export const client = {
     url: string,
     data?: TBody,
     config?: RequestConfig,
-  ): Promise<TData> {
+  ) {
     return unwrap<TData>(instance.post<ApiResponse<TData>>(url, data, config));
   },
 };
 ```
 
-类型增强后的调用直接得到业务数据，不需要每个接口重复解 `AxiosResponse<ApiResponse<T>>`：
+类型增强后的调用直接得到后端数据，不需要每个接口重复解 `AxiosResponse<ApiResponse<T>>`：
 
 ```ts
 const product = await client.get<Product>(`/products/${productId}`);
@@ -97,7 +101,7 @@ const created = await client.post<Product, CreateProductPayload>('/products', pa
 规则：
 
 - 所有 HTTP 请求必须通过 `client.get` / `client.post`。
-- 领域函数返回业务数据 `TData`，不返回 `AxiosResponse`。
+- 领域函数返回后端数据 `TData`，不返回 `AxiosResponse`。
 - `ApiResponse` 解包只发生在 client 或拦截器边界，不在组件里重复解包。
 - 需要扩展 `put` / `patch` / `delete` / 上传 / 下载时，必须按同一模式封装到 `client.ts`，不允许绕过实例。
 - 文件上传可以扩展独立方法，但要复用同一 `instance`、错误模型和取消判断。
@@ -123,6 +127,10 @@ export interface ProductListParams {
   pageSize?: number;
 }
 
+export interface GetProductDetailParams {
+  productId: string;
+}
+
 export interface ProductListOptions {
   signal?: AbortSignal;
 }
@@ -132,12 +140,26 @@ export interface ProductListOptions {
 // src/api/products/index.ts
 import { client } from '@/api/client';
 import type { PageResult } from '@/types/api';
-import type { Product, ProductListParams, ProductListOptions } from './types';
+import type {
+  GetProductDetailParams,
+  Product,
+  ProductListParams,
+  ProductListOptions,
+} from './types';
 
-export async function listProducts(
-  params: ProductListParams = {},
+export async function getProductDetail(
+  params: GetProductDetailParams,
   { signal }: ProductListOptions = {},
-): Promise<PageResult<Product>> {
+) {
+  const { productId } = params;
+
+  return client.get<Product>(`/products/${productId}`, { signal });
+}
+
+export async function getProductList(
+  params: ProductListParams,
+  { signal }: ProductListOptions = {},
+) {
   return client.get<PageResult<Product>>('/products', {
     params,
     signal,
@@ -147,46 +169,11 @@ export async function listProducts(
 
 命名：
 
-- 查询使用 `getXxx`、`listXxx`。
-- 创建、更新、删除使用 `createXxx`、`updateXxx`、`deleteXxx`。
-- 文件上传使用 `uploadXxx`。
+- 查询单条使用 `getMemberInfo`、`getProductDetail`。
+- 查询列表使用 `getMemberList`、`getProductList`，不使用 `listXxx`。
+- 创建、更新、删除使用 `createProduct`、`updateProduct`、`deleteProduct`。
+- 导出、上传、审核等动作使用动词开头：`exportOrder`、`uploadAttachment`、`approveOrder`。
 - 禁止把组件名写进接口函数名，例如 `fetchHomeProductListForHeroSection`。
-
-## 取消请求
-
-取消请求统一使用 `AbortController`，禁止使用 Axios `CancelToken`。
-
-```ts
-const controller = new AbortController();
-
-const products = await listProducts(
-  { pageNo: 1, pageSize: 20 },
-  { signal: controller.signal },
-);
-
-controller.abort();
-```
-
-可取消接口的最后一个参数接收 `signal`，并透传给 client：
-
-- 查询函数支持可选 `options.signal`。
-- 需要取消竞态请求时，由调用方创建并保存 `AbortController`。
-- 新请求发出前取消上一个请求。
-- 组件卸载或弹窗关闭时可以取消仍在进行的查询。
-- 取消不代表业务失败，不能展示错误提示。
-
-```ts
-// src/api/error.ts
-import axios from 'axios';
-
-export function isRequestCancelled(error: unknown): boolean {
-  return (
-    axios.isCancel(error) ||
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'CanceledError')
-  );
-}
-```
 
 ## 拦截器
 
@@ -234,7 +221,7 @@ export function registerInterceptors(instance: AxiosInstance) {
 
 ```ts
 try {
-  await listProducts(filters, { signal: controller.signal });
+  await getProductList(filters, { signal: controller.signal });
 } catch (error) {
   if (isRequestCancelled(error)) {
     return;
@@ -243,60 +230,3 @@ try {
   // 统一响应拦截器已处理错误提示。
 }
 ```
-
-## 错误与响应
-
-```ts
-// src/types/api.ts
-export interface ApiResponse<T> {
-  code: number;
-  data: T;
-  message: string;
-  requestId?: string;
-}
-
-export interface PageResult<T> {
-  list: T[];
-  total: number;
-  pageNo: number;
-  pageSize: number;
-}
-```
-
-```ts
-// src/api/error.ts
-export interface ApiErrorPayload {
-  code: number | string;
-  message: string;
-  status?: number;
-  requestId?: string;
-  details?: unknown;
-}
-
-export class ApiError extends Error {
-  readonly code: number | string;
-  readonly status?: number;
-  readonly requestId?: string;
-  readonly details?: unknown;
-
-  constructor(payload: ApiErrorPayload) {
-    super(payload.message);
-    this.name = 'ApiError';
-    this.code = payload.code;
-    this.status = payload.status;
-    this.requestId = payload.requestId;
-    this.details = payload.details;
-  }
-}
-```
-
-规则：
-
-- API 函数返回业务数据或抛出 `ApiError`，不把 AxiosError 直接泄漏到 UI。
-- 不在 API 函数里弹 toast、跳转路由或写 store；错误提示由拦截器统一处理，成功后的业务动作由调用方在 `await` 接口后决定。
-- 全局响应码放 `src/constants/http.ts`，业务模块错误码可放领域目录或 `src/constants/enums.ts`。
-- 业务枚举必须使用 `as const` 常量对象派生 union 类型；禁止 `enum`，禁止 API 类型和运行时值重复维护。
-- API 参数和响应中的状态、来源、类型码必须引用 `src/constants/`，不得硬编码字面量。
-- 401 处理必须防抖，避免并发请求同时触发多次跳转。
-- 静默刷新 token 的逻辑放在拦截器或专用 auth API 中，并保证并发请求只刷新一次。
-- 上传、下载、长轮询可以扩展独立 client 方法或专用实例，但必须复用错误模型和取消判断。

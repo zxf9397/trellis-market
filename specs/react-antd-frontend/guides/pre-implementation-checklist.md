@@ -10,7 +10,7 @@ paths:
 ## 1. 定位需求
 
 - 交互、数据、错误、空态、权限分别是什么？
-- 是否影响路由、登录态或全局布局？
+- 是否影响路由、登录态或全局布局？路由 `id`、path 和 `handle` 是否唯一且完整？
 - 需要兼容的浏览器、移动端和主题是什么？
 - 验收标准能否用 UI 行为描述？
 
@@ -28,7 +28,7 @@ paths:
 1. 页面私有内容放 `src/pages/<Page>/`
 2. 多页面业务组件放 `src/components/business/`
 3. 纯展示组件放 `src/components/ui/`
-4. 请求封装放 `src/api/<domain>/`
+4. 请求封装放 `src/api/<domain>/`；业务加工放领域 hook、页面或纯工具函数
 5. 数据获取默认使用 ahooks `useRequest`；跨页面 hook 放 `src/hooks/`
 6. 全局状态放 `src/store/`
 
@@ -37,7 +37,7 @@ paths:
 - 服务端状态在哪里获取、刷新；普通查询是否已用 ahooks `useRequest`？服务端分页列表是否使用 ProTable？
 - 错误是否由统一响应拦截器处理；成功后的业务动作是否写在 `await` 接口之后？
 - 状态、类型码和字典值是否引用 constants，没有硬编码？
-- 表单值、提交参数和接口协议字段如何转换？
+- 表单值、提交参数和接口协议字段如何转换？API 是否只做协议请求，业务加工是否放在调用侧？
 - loading/empty/error/success 如何表现？
 - 请求取消是否通过 `AbortController` 传递 signal？过期响应、重复触发和竞态如何处理？
 - 是否需要 401、权限、跳转？

@@ -62,7 +62,7 @@ API 函数也要写简洁 JSDoc：
  */
 export async function exportGwOrder(
   params: GwOrderExportParams,
-): Promise<GwOrderExportResult> {
+) {
   return client.post<GwOrderExportResult, GwOrderExportParams>(
     '/gw/order/export',
     params,
@@ -149,7 +149,7 @@ const mockData: GwOrderExportResult = {
  */
 export async function exportGwOrder(
   params: GwOrderExportParams,
-): Promise<GwOrderExportResult> {
+) {
   console.log('订单导出接口 Mock 数据返回', mockData);
 
   return mockData;

@@ -63,9 +63,9 @@ export interface GroupPurchaseListParams {
 }
 
 export async function getGroupPurchaseList(
-  params: GroupPurchaseListParams = {},
+  params: GroupPurchaseListParams,
   { signal }: { signal?: AbortSignal } = {},
-): Promise<PageResult<GroupPurchaseListItem>> {
+) {
   return client.get<PageResult<GroupPurchaseListItem>>('/mc/group-purchases', {
     params,
     signal,

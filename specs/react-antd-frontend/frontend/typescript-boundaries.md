@@ -56,7 +56,7 @@ paths:
 - 禁止运行时代码使用 `void` 操作符。
 - 具体函数声明、方法或函数表达式的无返回值返回注解必须省略，不要写 `: void`；`void` 只保留在类型契约中，例如 `onClose?: () => void`。
 - 故意不等待的 Promise 直接调用 `requestPage()`；不要写 `void requestPage()`。需要处理 rejection 时使用 `await try/catch` 或 `.catch()`。
-- 公共导出函数如果有返回值，写显式返回类型；无返回值时省略 `: void`，让 TypeScript 推断。
+- 函数定义能从实现推断返回值时，不要写显式返回类型；包括 API 函数的 `Promise<T>`。
 - 联合状态使用 discriminated union，不用多个可空字段表达互斥状态。
 - 枚举优先使用 `as const` 对象或字符串 union，除非需要运行时双向映射。
 - 组件 props 用 `interface`；复杂工具类型放 `src/types/`。
@@ -99,13 +99,27 @@ interface ExampleProps {
 }
 ```
 
-有返回值的公共导出函数仍写显式返回类型：
+返回值可推断时，不写显式返回类型：
 
 ```ts
-export async function getUser(id: string): Promise<User> {
+// ok
+export async function getUser(params: GetUserParams) {
+  const { id } = params;
+
   return client.get<User>(`/users/${id}`);
 }
 ```
+
+```ts
+// bad
+export async function getUser(params: GetUserParams): Promise<User> {
+  const { id } = params;
+
+  return client.get<User>(`/users/${id}`);
+}
+```
+
+只有返回值无法从实现推断或导出类型契约需要显式表达时，才写返回类型。
 
 ## 类型文件
 

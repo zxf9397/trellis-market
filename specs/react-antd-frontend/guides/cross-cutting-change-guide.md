@@ -12,11 +12,11 @@ paths:
 1. **配置**  
    更新 `.env.example`、`src/config/env.ts`、feature flag 和类型。
 2. **API**  
-   添加领域 `types.ts`、接口函数、错误码和响应模型；新增业务枚举时先在 `src/constants/` 定义 `as const` 对象。有文档时补全 JSDoc；无文档时使用 typed API Mock。
+   添加领域 `types.ts`、接口函数、params 类型和响应模型；新增业务枚举时先在 `src/constants/` 定义 `as const` 对象。有文档时补全 JSDoc；无文档时使用 typed API Mock。
 3. **状态/Hook**  
    决定服务端状态、客户端状态、权限状态分别放哪里。
 4. **路由与弹窗**  
-   添加 route module、路径常量、meta、守卫和懒加载；业务弹窗/抽屉使用 `NiceModal.show()` 触发。
+   添加 route `id`、路径、`Component` / `element`、`handle`、守卫和懒加载；业务弹窗/抽屉使用 `NiceModal.show()` 触发，并生成 `routeMap`。
 5. **布局/页面**  
    组合布局、页面 hook、business/ui 组件；服务端分页列表使用 ProTable。
 6. **成功/错误处理**  
@@ -36,5 +36,6 @@ paths:
 - 新增字典是否放对了常量层？
 - 表单是否使用 Ant Design Form，并正确校验、初始化和提交？
 - 列表分页是否使用 `pageNo` / `pageSize`，搜索空值是否过滤？
+- API 函数第一个参数是否为类型化 `params` 对象？是否只做协议请求和响应透传，业务加工是否放在调用侧？
 - 枚举运行时值、API 类型和 UI 元数据是否来自同一个常量来源？
 - 生产构建是否意外包含 mock/dev-only 代码？
